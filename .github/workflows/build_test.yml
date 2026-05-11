@@ -101,10 +101,10 @@ jobs:
           docker compose ps
           docker compose logs
       - name: Test posts route
-        run: curl -f http://localhost:8000/posts
+        run: curl --retry 10 --retry-delay 5 --retry-all-errors -f http://localhost:8000/posts
 
       - name: Test users route
-        run: curl -f http://localhost:8000/users
+        run: curl --retry 10 --retry-delay 5 --retry-all-errors -f http://localhost:8000/users
 
       - name: Stop docker compose stack
         if: always()
