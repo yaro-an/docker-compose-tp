@@ -98,11 +98,6 @@ jobs:
           docker compose logs db_mysql
           exit 1
 
-
-      - name: Debug docker compose
-        run: |
-          docker compose ps
-          docker compose logs api
       - name: Test posts route
         run: curl --retry 10 --retry-delay 5 --retry-all-errors -f http://localhost:8000/posts
 
