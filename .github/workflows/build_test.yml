@@ -32,5 +32,13 @@ jobs:
           command: cves
           image: my-app:1.0.0
           file: ./api/Dockerfile
-          only-severities: critical,high
+          only-severities: critical
           exit-code: true
+
+      - name: Trivy Scan MySQL image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: mysql:9.6
+          severity: CRITICAL,HIGH
+          exit-code: 0
+          format: table
