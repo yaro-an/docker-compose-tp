@@ -53,8 +53,16 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
+          echo "MYSQL_DATABASE=app_db" >> .env
+          echo "MYSQL_USER=app_user" >> .env
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
+
+          echo "MONGO_ROOT_USERNAME=root" >> .env
+          echo "MONGO_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
+          echo "MONGO_APP_USER=app_user" >> .env
+          echo "MONGO_APP_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
+          echo "MONGO_APP_DB=app_db" >> .env
 
       - name: Start docker compose stack
         run: docker compose up -d --build
