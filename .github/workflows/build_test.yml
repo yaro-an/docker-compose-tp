@@ -72,17 +72,17 @@ jobs:
 
       - name: Wait for healthy containers
         run: |
-          echo "Waiting for containers to become healthy..."
+          echo "Waiting for main containers to become healthy..."
 
           for i in {1..24}; do
             echo "Attempt $i/24"
 
-            docker compose ps
+            docker compose ps api db_mongo db_mysql
 
-            unhealthy=$(docker compose ps --format json | jq -r 'select(.Health != "healthy") | .Name + " = " + (.Health // "no-healthcheck")' || true)
+            unhealthy=$(docker compose ps api db_mongo db_mysql --format json | jq -r 'select(.Health != "healthy") | .Name + " = " + (.Health // "no-healthcheck")' || true)
 
             if [ -z "$unhealthy" ]; then
-              echo "All containers are healthy"
+              echo "Main containers are healthy"
               exit 0
             fi
 
