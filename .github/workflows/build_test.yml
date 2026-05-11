@@ -54,15 +54,15 @@ jobs:
       - name: Create .env file
         run: |
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
-          echo "MYSQL_DATABASE=app_db" >> .env
-          echo "MYSQL_USER=app_user" >> .env
+          echo "MYSQL_DATABASE=ynov_ci" >> .env
+          echo "MYSQL_USER=root" >> .env
           echo "MYSQL_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
 
           echo "MONGO_ROOT_USERNAME=root" >> .env
           echo "MONGO_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
           echo "MONGO_APP_USER=app_user" >> .env
           echo "MONGO_APP_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
-          echo "MONGO_APP_DB=app_db" >> .env
+          echo "MONGO_APP_DB=blog_db" >> .env
 
       - name: Start docker compose stack
         run: docker compose up -d --build
@@ -74,26 +74,29 @@ jobs:
         run: |
           echo "Waiting for containers to become healthy..."
 
-          for i in {1..12}; do
-            echo "Attempt $i/12"
+          for i in {1..24}; do
+            echo "Attempt $i/24"
 
             docker compose ps
 
-            unhealthy=$(docker compose ps --format json | jq -r '.[].Health' | grep -v "healthy" || true)
+            unhealthy=$(docker compose ps --format json | jq -r 'select(.Health != "healthy") | .Name + " = " + (.Health // "no-healthcheck")' || true)
 
             if [ -z "$unhealthy" ]; then
               echo "All containers are healthy"
               exit 0
             fi
 
-            echo "Some containers are not healthy yet..."
+            echo "Not ready yet:"
+            echo "$unhealthy"
             sleep 5
           done
 
           echo "Containers did not become healthy in time"
-          docker compose logs
+          docker compose ps
+          docker compose logs api
+          docker compose logs db_mongo
+          docker compose logs db_mysql
           exit 1
-
 
 
       - name: Debug docker compose
@@ -101,7 +104,7 @@ jobs:
           docker compose ps
           docker compose logs api
       - name: Test posts route
-        run: curl --retry 10 --retry-delay 5 --retry-all-errors  http://localhost:8000/posts
+        run: curl --retry 10 --retry-delay 5 --retry-all-errors -f http://localhost:8000/posts
 
       - name: Test users route
         run: curl --retry 10 --retry-delay 5 --retry-all-errors -f http://localhost:8000/users
