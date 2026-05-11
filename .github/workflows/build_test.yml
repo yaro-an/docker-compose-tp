@@ -94,6 +94,12 @@ jobs:
           docker compose logs
           exit 1
 
+
+
+      - name: Debug docker compose
+        run: |
+          docker compose ps
+          docker compose logs
       - name: Test posts route
         run: curl -f http://localhost:8000/posts
 
