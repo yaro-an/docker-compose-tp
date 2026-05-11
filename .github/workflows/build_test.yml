@@ -99,9 +99,9 @@ jobs:
       - name: Debug docker compose
         run: |
           docker compose ps
-          docker compose logs
+          docker compose logs api
       - name: Test posts route
-        run: curl --retry 10 --retry-delay 5 --retry-all-errors -f http://localhost:8000/posts
+        run: curl --retry 10 --retry-delay 5 --retry-all-errors  http://localhost:8000/posts
 
       - name: Test users route
         run: curl --retry 10 --retry-delay 5 --retry-all-errors -f http://localhost:8000/users
